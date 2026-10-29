@@ -46,10 +46,10 @@ function draw(){
   const canvas=$('chart'),box=canvas.getBoundingClientRect();if(!box.width)return;
   const dpr=window.devicePixelRatio||1;canvas.width=box.width*dpr;canvas.height=box.height*dpr;
   const ctx=canvas.getContext('2d');ctx.scale(dpr,dpr);
-  const w=box.width,h=box.height,l=36,r=16,top=18,bottom=34;
+  const w=box.width,h=box.height,l=48,r=18,top=20,bottom=42;
   const max=chartMode==='h'?1.7:Math.max(300,Math.ceil(Math.max(...history.flatMap(x=>[x.sa.total,x.sb.total]))/100)*100);
   const x=t=>l+t/20*(w-l-r),y=v=>top+(1-v/max)*(h-top-bottom);
-  ctx.font='10px system-ui';ctx.textAlign='right';
+  ctx.font='14px system-ui';ctx.textAlign='right';
   for(let i=0;i<=4;i++){
    const v=chartMode==='h'?i*.4:i*max/4;
    ctx.strokeStyle='#e6eadf';ctx.setLineDash([3,4]);ctx.beginPath();ctx.moveTo(l,y(v));ctx.lineTo(w-r,y(v));ctx.stroke();
@@ -57,7 +57,7 @@ function draw(){
   }
   ctx.setLineDash([]);ctx.textAlign='center';
   for(let t=0;t<=20;t+=5)ctx.fillText(t,x(t),h-17);
-  ctx.textAlign='right';ctx.font='8px system-ui';ctx.fillText('단계',w-r,h-2);
+  ctx.textAlign='right';ctx.font='13px system-ui';ctx.fillText('단계',w-r,h-2);
   for(const [key,color]of [['sa','#4d8158'],['sb','#d88655']]){
    const grad=ctx.createLinearGradient(0,top,0,h-bottom);grad.addColorStop(0,key==='sa'?'#71986018':'#d8865525');grad.addColorStop(1,'#ffffff00');
    ctx.beginPath();history.forEach((row,i)=>{i?ctx.lineTo(x(row.step),y(row[key][chartMode])):ctx.moveTo(x(row.step),y(row[key][chartMode]));});
@@ -67,16 +67,16 @@ function draw(){
   }
 }
 function pause(){if(timer)clearInterval(timer);timer=null;$('play').textContent='▶ 자동 진행';}
-function advance(){if(step>=20)return;if(step===0){updateConditions();runSeed=Math.min(9999,Math.max(1,Math.round(Number($('seed').value)||42)));$('seed').value=runSeed;defs.forEach(d=>$(d.id).disabled=true);$('seed').disabled=true;document.querySelectorAll('[data-preset]').forEach(b=>b.disabled=true);}const before=[...B];A=evolve(A,base,step);B=evolve(B,conditions,step);step++;remember();setPhase(step===20?3:2);const losses=B.map((v,i)=>before[i]>0&&v===0?species[i].name:null).filter(Boolean);let j=0;B.forEach((v,i)=>{if(v-before[i]<B[j]-before[j])j=i;});$('eventTitle').textContent=step===20?'실험 완료 · 근거를 모아 토의하세요':`${step}단계 · 함께 확인하기`;$('eventText').textContent=losses.length?`${losses.join(', ')}의 개체 수가 0이 되었습니다. 이전 단계의 추세와 대조군을 비교해 원인을 토의하세요.`:`${species[j].name}: ${before[j]} → ${B[j]}개체. ${conditions.area<100?'서식지 감소는 종별 수용력을 낮춥니다. ':''}${conditions.poll>0?'오염에 대한 종별 민감도가 다르게 설정되어 있습니다. ':''}${conditions.heat>0?'기온 상승의 영향은 종마다 다릅니다. ':''}먹이 생물의 개체 수도 함께 비교하세요.`;$('runLabel').textContent=step===20?'완료 · CSV를 저장하고 다른 조건과 비교하세요':'조건 고정 · 단계별 결과를 관찰하세요';if(step===20)pause();render();}
-function reset(){pause();step=0;A=[80,60,45,30,25];B=[...A];history=[];remember();defs.forEach(d=>$(d.id).disabled=false);$('seed').disabled=false;document.querySelectorAll('[data-preset]').forEach(b=>b.disabled=false);$('runLabel').textContent='가설을 적고 실험을 시작하세요';$('eventTitle').textContent='관찰 준비';$('eventText').textContent='두 집단의 종별 개체 수는 같습니다. 조건을 바꾸고 다음 단계의 변화를 예측하세요.';setPhase(0);render();}
+function advance(){if(step>=20)return;if(step===0){updateConditions();defs.forEach(d=>$(d.id).disabled=true);document.querySelectorAll('[data-preset]').forEach(b=>b.disabled=true);}const before=[...B];A=evolve(A,base,step);B=evolve(B,conditions,step);step++;remember();setPhase(step===20?3:2);const losses=B.map((v,i)=>before[i]>0&&v===0?species[i].name:null).filter(Boolean);let j=0;B.forEach((v,i)=>{if(v-before[i]<B[j]-before[j])j=i;});$('eventTitle').textContent=step===20?'실험 완료 · 근거를 모아 토의하세요':`${step}단계 · 함께 확인하기`;$('eventText').textContent=losses.length?`${losses.join(', ')}의 개체 수가 0이 되었습니다. 이전 단계의 추세와 대조군을 비교해 원인을 토의하세요.`:`${species[j].name}: ${before[j]} → ${B[j]}개체. ${conditions.area<100?'서식지 감소는 종별 수용력을 낮춥니다. ':''}${conditions.poll>0?'오염에 대한 종별 민감도가 다르게 설정되어 있습니다. ':''}${conditions.heat>0?'기온 상승의 영향은 종마다 다릅니다. ':''}먹이 생물의 개체 수도 함께 비교하세요.`;$('runLabel').textContent=step===20?'완료 · CSV를 저장하고 다른 조건과 비교하세요':'조건 고정 · 단계별 결과를 관찰하세요';if(step===20)pause();render();}
+function reset(){pause();step=0;A=[80,60,45,30,25];B=[...A];history=[];remember();defs.forEach(d=>$(d.id).disabled=false);document.querySelectorAll('[data-preset]').forEach(b=>b.disabled=false);$('runLabel').textContent='가설을 적고 실험을 시작하세요';$('eventTitle').textContent='관찰 준비';$('eventText').textContent='두 집단의 종별 개체 수는 같습니다. 조건을 바꾸고 다음 단계의 변화를 예측하세요.';setPhase(0);render();}
 defs.forEach(d=>$(d.id).addEventListener('input',()=>{document.querySelectorAll('[data-preset]').forEach(b=>b.classList.remove('selected'));$('scenarioHint').textContent='직접 설정한 조건입니다. 바꾼 변인과 예상 결과를 탐구 노트에 적어보세요.';updateConditions();}));
 document.querySelectorAll('[data-preset]').forEach(b=>b.addEventListener('click',()=>{const p=presets[b.dataset.preset];defs.forEach(d=>$(d.id).value=p[d.id]);document.querySelectorAll('[data-preset]').forEach(x=>x.classList.toggle('selected',x===b));updateConditions();$('scenarioHint').textContent=scenarioHints[b.dataset.preset];}));
 $('next').onclick=advance;$('play').onclick=()=>{if(timer){pause();return;}advance();if(step<20){timer=setInterval(advance,1100);$('play').textContent='Ⅱ 일시 정지';}};$('reset').onclick=()=>{if(step&&!confirm('현재 실험 수치를 초기화할까요? 탐구 노트는 유지됩니다. 필요한 경우 먼저 CSV를 저장하세요.'))return;reset();};
 function saveFile(name,content,type){const url=URL.createObjectURL(new Blob(['\ufeff',content],{type}));const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);$('status').textContent='파일을 저장했습니다. 다운로드 폴더를 확인하세요.';}
-$('csv').onclick=()=>{const seed=step?runSeed:Math.min(9999,Math.max(1,Math.round(Number($('seed').value)||42)));const head=['실험번호','단계','집단','서식지(%)','오염(%)','기온상승(℃)',...species.map(s=>s.name),'전체개체수','종수','Shannon_H'];let rows=[head];history.forEach(row=>{for(const key of ['a','b']){const c=key==='a'?base:conditions,s=row['s'+key];rows.push([seed,row.step,key==='a'?'대조군':'실험군',c.area,c.poll,c.heat,...row[key],s.total,s.rich,s.h.toFixed(6)]);}});saveFile('생물다양성_실험기록.csv',rows.map(row=>row.join(',')).join('\r\n'),'text/csv;charset=utf-8');};
+$('csv').onclick=()=>{const head=['단계','집단','서식지(%)','오염(%)','기온상승(℃)',...species.map(s=>s.name),'전체개체수','종수','Shannon_H'];let rows=[head];history.forEach(row=>{for(const key of ['a','b']){const c=key==='a'?base:conditions,s=row['s'+key];rows.push([row.step,key==='a'?'대조군':'실험군',c.area,c.poll,c.heat,...row[key],s.total,s.rich,s.h.toFixed(6)]);}});saveFile('생물다양성_실험기록.csv',rows.map(row=>row.join(',')).join('\r\n'),'text/csv;charset=utf-8');};
 const fields=['hypothesis','evidence','conclusion'];let storageOK=true;try{const data=JSON.parse(localStorage.getItem('biodiversity-notes-v1')||'{}');fields.forEach(id=>$(id).value=typeof data[id]==='string'?data[id]:'');}catch{storageOK=false;}$('status').textContent=storageOK?'탐구 노트는 이 브라우저에 자동 저장됩니다.':'브라우저 자동 저장을 사용할 수 없습니다. 탐구 노트 저장 버튼을 이용하세요.';
 fields.forEach(id=>$(id).addEventListener('input',()=>{try{localStorage.setItem('biodiversity-notes-v1',JSON.stringify(Object.fromEntries(fields.map(k=>[k,$(k).value]))));$('status').textContent='탐구 노트를 브라우저에 저장했습니다.';}catch{$('status').textContent='자동 저장 실패 · 탐구 노트 저장 버튼으로 파일을 저장하세요.';}}));
-$('download').onclick=()=>saveFile('생물다양성_탐구노트.txt',`생물다양성 탐구실\n${step} / 20 단계 · 실험 번호 ${step?runSeed:$('seed').value}\n조건: 서식지 ${conditions.area}%, 오염 ${conditions.poll}%, 기온 +${conditions.heat}℃\n${$('chartSummary').textContent}\n\n`+fields.map((id,i)=>['질문과 가설','관찰과 근거','해석과 보전 제안'][i]+'\n'+$(id).value).join('\n\n'),'text/plain;charset=utf-8');$('print').onclick=()=>{pause();window.print();};window.addEventListener('resize',draw);
+$('download').onclick=()=>saveFile('생물다양성_탐구노트.txt',`생물다양성 탐구실\n${step} / 20 단계\n조건: 서식지 ${conditions.area}%, 오염 ${conditions.poll}%, 기온 +${conditions.heat}℃\n${$('chartSummary').textContent}\n\n`+fields.map((id,i)=>['질문과 가설','관찰과 근거','해석과 보전 제안'][i]+'\n'+$(id).value).join('\n\n'),'text/plain;charset=utf-8');$('print').onclick=()=>{pause();window.print();};window.addEventListener('resize',draw);
 const scenarioHints={
  base:'대조군과 실험군이 같은 환경입니다. 먼저 기준 실험을 해보세요.',
  habitat:'서식지만 40%로 줄였습니다. 수용력의 변화는 어떤 종에 더 크게 작용할까요?',
@@ -111,7 +111,7 @@ for(const [id,mode]of [['diversityChart','h'],['totalChart','total']])$(id).oncl
  $('chartTooltip').hidden=true;render();
 };
 $('chart').addEventListener('pointermove',e=>{
- const box=$('chart').getBoundingClientRect();const t=Math.max(0,Math.min(step,Math.round((e.clientX-box.left-36)/(box.width-52)*20)));
+ const box=$('chart').getBoundingClientRect();const t=Math.max(0,Math.min(step,Math.round((e.clientX-box.left-48)/(box.width-66)*20)));
  const row=history[t];if(!row)return;
  const value=s=>chartMode==='h'?s.h.toFixed(3):s.total+'개체';
  $('chartTooltip').textContent=`${t}단계 · A ${value(row.sa)} / B ${value(row.sb)}`;$('chartTooltip').hidden=false;
@@ -119,13 +119,51 @@ $('chart').addEventListener('pointermove',e=>{
 $('chart').addEventListener('pointerleave',()=>$('chartTooltip').hidden=true);
 $('capture').onclick=()=>{
  pause();const sa=stats(A),sb=stats(B);
- const entry=`[${step}단계 · 실험 ${step?runSeed:$('seed').value}] 서식지 ${conditions.area}%, 오염 ${conditions.poll}%, 기온 +${conditions.heat}℃\nA: ${sa.total}개체 / ${sa.rich}종 / H′ ${sa.h.toFixed(3)}\nB: ${sb.total}개체 / ${sb.rich}종 / H′ ${sb.h.toFixed(3)}\n${species.map((s,i)=>s.name+' A '+A[i]+' / B '+B[i]).join(' · ')}`;
+ const entry=`[${step}단계] 서식지 ${conditions.area}%, 오염 ${conditions.poll}%, 기온 +${conditions.heat}℃\nA: ${sa.total}개체 / ${sa.rich}종 / H′ ${sa.h.toFixed(3)}\nB: ${sb.total}개체 / ${sb.rich}종 / H′ ${sb.h.toFixed(3)}\n${species.map((s,i)=>s.name+' A '+A[i]+' / B '+B[i]).join(' · ')}`;
  $('evidence').value+=($('evidence').value?'\n\n':'')+entry;
  $('evidence').dispatchEvent(new Event('input'));
  $('capture').textContent='기록 완료 ✓';setTimeout(()=>$('capture').textContent='관찰 기록 +',1600);
 };
-if('IntersectionObserver' in window){
- const sections=['lab','journal','guide'];const observer=new IntersectionObserver(entries=>{entries.forEach(entry=>{if(entry.isIntersecting)document.querySelectorAll('.masthead nav a').forEach(a=>a.classList.toggle('nav-active',a.hash==='#'+entry.target.id));});},{rootMargin:'-15% 0px -65% 0px'});
- sections.forEach(id=>observer.observe($(id)));
+// Accessible, persistent-in-memory tab panels. Switching tabs pauses observation.
+const tabIds = ['lab', 'results', 'journal', 'guide'];
+const tabDescriptions = {
+ lab: ['환경을 바꾸고, 생명의 변화를 관찰해요.', '조건을 설정하고 한 단계씩 진행하세요. 결과와 기록은 위쪽 탭에서 확인할 수 있어요.'],
+ results: ['무엇이, 얼마나 달라졌을까요?', '생물별 개체 수와 그래프를 비교하고, 단계별 기록에서 근거를 찾아보세요.'],
+ journal: ['우리 모둠의 생각을 기록해요.', '가설과 관찰 근거를 연결해 결론을 정리하세요. 탭을 옮겨도 기록은 유지됩니다.'],
+ guide: ['생물다양성, 함께 이해해요.', '개념과 모형의 가정을 확인하고 우리 모둠의 결과를 다시 해석해보세요.']
+};
+function openTab(id, focusTab = false) {
+ if (!tabIds.includes(id)) id = 'lab';
+ pause();
+ for (const key of tabIds) {
+  const selected = key === id;
+  $(key).hidden = !selected;
+  $('tab-' + key).setAttribute('aria-selected', String(selected));
+  $('tab-' + key).tabIndex = selected ? 0 : -1;
+ }
+ $('pageTitle').textContent = tabDescriptions[id][0];
+ $('pageDescription').textContent = tabDescriptions[id][1];
+ $('chartTooltip').hidden = true;
+ if (id === 'results') requestAnimationFrame(draw);
+ if (focusTab) $('tab-' + id).focus();
+ window.scrollTo({top: 0, behavior: 'instant'});
 }
+for (const id of tabIds) {
+ $('tab-' + id).onclick = () => {location.hash = id; openTab(id);};
+ $('tab-' + id).onkeydown = event => {
+  let target = tabIds.indexOf(id);
+  if (event.key === 'ArrowRight') target = (target + 1) % tabIds.length;
+  else if (event.key === 'ArrowLeft') target = (target + tabIds.length - 1) % tabIds.length;
+  else if (event.key === 'Home') target = 0;
+  else if (event.key === 'End') target = tabIds.length - 1;
+  else return;
+  event.preventDefault(); location.hash = tabIds[target]; openTab(tabIds[target], true);
+ };
+}
+document.querySelectorAll('[data-open-tab]').forEach(button => button.addEventListener('click', event => {
+ event.preventDefault(); const id = button.dataset.openTab; location.hash = id; openTab(id, true);
+}));
+window.addEventListener('hashchange', () => openTab(location.hash.slice(1)));
 updateConditions();reset();
+
+openTab(location.hash.slice(1));
